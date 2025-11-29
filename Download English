@@ -2,6 +2,7 @@
     UFO HUB X • Download Screen (Letter-by-letter Title + BIG Flag)
     BG Image: 130548594326307
     Title: ขึ้นทีละตัวภายใน ~4 วินาที
+    Rule สี: "UFO " สีขาว, "HUB X" สีเขียว
     Progress: 0 → 100% ภายใน 5 วินาที
     ธง 🇺🇸 ใหญ่กว่าหลอด download ชัดเจน แต่ยังเกาะปลายแท่งเขียว
     เสร็จแล้วทุกอย่างเฟดหายไป
@@ -35,7 +36,8 @@ bg.Image = "rbxassetid://130548594326307"
 bg.ScaleType = Enum.ScaleType.Crop
 bg.ImageTransparency = 0
 
--- TITLE "UFO HUB X" ขึ้นทีละตัว (UFO เขียว HUB X ขาว)
+-- TITLE "UFO HUB X" ขึ้นทีละตัว
+-- กติกา: UFO = ขาว, HUB X = เขียว
 local title = Instance.new("TextLabel")
 title.Parent = gui
 title.AnchorPoint = Vector2.new(0.5,0.5)
@@ -45,7 +47,7 @@ title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBlack
 title.RichText = true
 title.TextScaled = true
-title.TextColor3 = Color3.new(1,1,1)
+title.TextColor3 = Color3.new(1,1,1) -- base ขาว
 title.TextStrokeColor3 = Color3.new(0,0,0)
 title.TextStrokeTransparency = 0
 title.Text = ""
@@ -58,14 +60,21 @@ local stepDelay = totalTime / steps
 task.spawn(function()
     for i = 1, #fullText do
         local text = fullText:sub(1, i)
-        local green = text:sub(1, math.min(3, #text))
-        local white = (#text > 3) and text:sub(4) or ""
 
-        title.Text = string.format(
-            '<font color="rgb(25,255,125)">%s</font>%s',
-            green, white
-        )
+        -- ตัวที่ 1–4 = "UFO " (ขาว)
+        local whitePart = text:sub(1, math.min(4, #text))
+        -- ตัวที่ 5 เป็นต้นไป = "HUB X" (เขียว)
+        local greenPart = ""
+        if #text > 4 then
+            greenPart = text:sub(5)
+        end
 
+        local rich = whitePart
+        if #greenPart > 0 then
+            rich = string.format('%s<font color="rgb(25,255,125)">%s</font>', whitePart, greenPart)
+        end
+
+        title.Text = rich
         task.wait(stepDelay)
     end
 end)
