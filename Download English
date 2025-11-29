@@ -1,1 +1,118 @@
+--[[
+    UFO HUB X • Download Screen
+    BG Image: 130548594326307 (เต็มจอ)
+    Progress: 0 → 100% ใน 3 วินาที
+    Bar: สีเขียว, ขอบดำ, ตัวหนังสือ Download XX% สีขาว ขอบดำ
+    Title: UFO HUB X ด้านบน ใหญ่ๆ อยู่ตรงกลาง
+]]
 
+local Players    = game:GetService("Players")
+local CoreGui    = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+
+local lp = Players.LocalPlayer
+
+-- ถ้ามีเก่าอยู่ ลบก่อนป้องกันซ้อน
+local OLD = CoreGui:FindFirstChild("UFOX_DownloadScreen")
+if OLD then
+    OLD:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "UFOX_DownloadScreen"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+gui.Parent = CoreGui
+
+-- พื้นหลังเต็มจอ
+local bg = Instance.new("ImageLabel")
+bg.Name = "Background"
+bg.Parent = gui
+bg.Size = UDim2.fromScale(1,1)
+bg.Position = UDim2.fromScale(0.5,0.5)
+bg.AnchorPoint = Vector2.new(0.5,0.5)
+bg.BackgroundTransparency = 1
+bg.Image = "rbxassetid://130548594326307"
+bg.ScaleType = Enum.ScaleType.Crop
+
+-- ชื่อ UFO HUB X ข้างบน
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Parent = gui
+title.BackgroundTransparency = 1
+title.AnchorPoint = Vector2.new(0.5,0.5)
+title.Position = UDim2.new(0.5,0,0.35,0)
+title.Size = UDim2.new(0.8,0,0,60)
+title.Font = Enum.Font.GothamBlack
+title.Text = "UFO HUB X"
+title.TextScaled = true
+title.TextColor3 = Color3.new(1,1,1)
+title.TextStrokeColor3 = Color3.new(0,0,0)
+title.TextStrokeTransparency = 0
+title.TextXAlignment = Enum.TextXAlignment.Center
+
+-- กล่องหลอดดาวน์โหลด (กรอบ)
+local barHolder = Instance.new("Frame")
+barHolder.Name = "DownloadBarHolder"
+barHolder.Parent = gui
+barHolder.AnchorPoint = Vector2.new(0.5,0.5)
+barHolder.Position = UDim2.new(0.5,0,0.55,0)
+barHolder.Size = UDim2.new(0.6,0,0,40)
+barHolder.BackgroundColor3 = Color3.new(0,0,0)
+barHolder.BackgroundTransparency = 0.3
+
+local holderCorner = Instance.new("UICorner", barHolder)
+holderCorner.CornerRadius = UDim.new(0,14)
+
+local holderStroke = Instance.new("UIStroke", barHolder)
+holderStroke.Thickness = 2
+holderStroke.Color = Color3.new(0,0,0)
+holderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- แท่งสีเขียวข้างใน (progress fill)
+local fill = Instance.new("Frame")
+fill.Name = "Fill"
+fill.Parent = barHolder
+fill.AnchorPoint = Vector2.new(0,0.5)
+fill.Position = UDim2.new(0,2,0.5,0)
+fill.Size = UDim2.new(0, -4, 1, -8) -- เริ่ม 0 ความกว้าง
+fill.BackgroundColor3 = Color3.fromRGB(25,255,125)
+
+local fillCorner = Instance.new("UICorner", fill)
+fillCorner.CornerRadius = UDim.new(0,12)
+
+-- ตัวหนังสือ Download + เปอร์เซ็นต์ อยู่ตรงกลางหลอด
+local label = Instance.new("TextLabel")
+label.Name = "DownloadLabel"
+label.Parent = barHolder
+label.BackgroundTransparency = 1
+label.Size = UDim2.new(1,0,1,0)
+label.Font = Enum.Font.GothamBold
+label.TextScaled = true
+label.TextColor3 = Color3.new(1,1,1)
+label.TextStrokeColor3 = Color3.new(0,0,0)
+label.TextStrokeTransparency = 0
+label.TextXAlignment = Enum.TextXAlignment.Center
+label.TextYAlignment = Enum.TextYAlignment.Center
+label.Text = "Download 0%"
+
+-- แอนิเมชันดาวน์โหลด 0 → 100% ใน 3 วินาที
+local duration = 3
+local steps    = 100
+local delayPer = duration / steps
+
+task.spawn(function()
+    for i = 0, steps do
+        local alpha = i / steps
+        -- ปรับขนาด fill ตามเปอร์เซ็นต์
+        fill.Size = UDim2.new(alpha, -4, 1, -8)
+        -- ปรับตัวหนังสือ
+        label.Text = ("Download %d%%"):format(i)
+        task.wait(delayPer)
+    end
+
+    -- ถ้าอยากให้หายไปหลังโหลดเสร็จ uncomment ตรงนี้
+    -- task.wait(0.5)
+    -- gui:Destroy()
+end)
